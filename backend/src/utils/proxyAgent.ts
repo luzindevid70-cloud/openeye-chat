@@ -1,0 +1,1 @@
+export const getProxyAgent = () => undefined;

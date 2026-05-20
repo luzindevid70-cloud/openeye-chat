@@ -1,0 +1,3 @@
+import { Response, NextFunction } from 'express'; import { PrismaClient } from '@prisma/client'; import { AuthRequest } from './auth';
+const prisma = new PrismaClient();
+export const checkLimit = async (req: AuthRequest, res: Response, next: NextFunction) => { if (req.userRole === 'premium') return next(); const user = await prisma.user.findUnique({ where: { id: req.userId } }); if (!user) return res.status(404).end(); const now = new Date(); const lastReset = new Date(user.lastReset); if (now.getDate() !== lastReset.getDate() || now.getMonth() !== lastReset.getMonth()) { await prisma.user.update({ where: { id: user.id }, data: { dailyMsgs: 0, lastReset: now } }); } if (user.dailyMsgs >= 50) return res.status(429).json({ error: 'Дневной лимит исчерпан' }); next(); };

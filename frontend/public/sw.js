@@ -1,0 +1,1 @@
+self.addEventListener('install',e=>{e.waitUntil(caches.open('openeye-v1').then(c=>c.addAll(['/offline.html'])));self.skipWaiting();}); self.addEventListener('fetch',e=>{e.respondWith(caches.match(e.request).then(c=>c||fetch(e.request)).catch(()=>caches.match('/offline.html')));});

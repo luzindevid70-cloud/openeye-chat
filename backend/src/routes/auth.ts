@@ -1,0 +1,5 @@
+import { Router, Request, Response } from 'express'; import bcrypt from 'bcryptjs'; import jwt from 'jsonwebtoken'; import { PrismaClient } from '@prisma/client';
+const prisma = new PrismaClient(); const router = Router();
+router.post('/register', async (req: Request, res: Response) => { const { email, password } = req.body; const hashed = await bcrypt.hash(password, 10); const user = await prisma.user.create({ data: { email, password: hashed } }); const token = jwt.sign({ userId: user.id, role: user.role }, process.env.JWT_SECRET!); res.json({ token, user: { id: user.id, email: user.email, role: user.role } }); });
+router.post('/login', async (req: Request, res: Response) => { const { email, password } = req.body; const user = await prisma.user.findUnique({ where: { email } }); if (!user || !(await bcrypt.compare(password, user.password))) return res.status(401).json({ error: 'Неверные данные' }); const token = jwt.sign({ userId: user.id, role: user.role }, process.env.JWT_SECRET!); res.json({ token, user: { id: user.id, email: user.email, role: user.role } }); });
+export default router;

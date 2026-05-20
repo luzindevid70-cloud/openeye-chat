@@ -1,0 +1,1 @@
+import type { Config } from 'tailwindcss'; const config: Config = { content: ['./src/**/*.{js,ts,jsx,tsx,mdx}'], darkMode: 'class', theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'] }, colors: { 'gpt-dark': '#343541', 'gpt-sidebar': '#202123', 'gpt-message-user': '#343541', 'gpt-message-bot': '#444654' } } }, plugins: [] }; export default config;
