@@ -1,0 +1,44 @@
+services:
+  - type: web
+    name: openeye-backend
+    env: node
+    plan: free
+    rootDir: backend
+    buildCommand: npm ci && npx prisma generate && npm run build
+    startCommand: npx prisma migrate deploy && node dist/index.js
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: openeye-db
+          property: connectionString
+      - key: REDIS_URL
+        value: redis://dummy:6379
+      - key: JWT_SECRET
+        generateValue: true
+      - key: FRONTEND_URL
+        value: https://openeye-frontend.onrender.com
+      - key: HF_API_TOKEN
+        sync: false
+      - key: FREE_DAILY_LIMIT
+        value: "50"
+
+  - type: web
+    name: openeye-frontend
+    env: node
+    plan: free
+    rootDir: frontend
+    buildCommand: npm ci && npm run build
+    startCommand: node server.js
+    envVars:
+      - key: NEXTAUTH_URL
+        value: https://openeye-frontend.onrender.com
+      - key: NEXTAUTH_SECRET
+        generateValue: true
+      - key: NEXT_PUBLIC_BACKEND_URL
+        value: https://openeye-backend.onrender.com
+
+databases:
+  - name: openeye-db
+    plan: free
+    databaseName: openeye
+    user: openeye
